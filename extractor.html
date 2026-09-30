@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tender Extractor AI — Live Agent Execution & Results</title>
+  <link rel="icon" type="image/png" href="image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-950: #070f1e;
+      --navy-900: #0d1b2a;
+      --navy-800: #14273e;
+      --navy-700: #1b3554;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-glow: rgba(59, 130, 246, 0.35);
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --line-soft: #f1f5f9;
+      --paper: #ffffff;
+      --wash: #f8fafc;
+      --good: #059669;
+      --good-wash: #ecfdf5;
+      --good-border: #a7f3d0;
+      --terminal-bg: #090e17;
+      --terminal-chrome: #111827;
+      --terminal-border: #1f293d;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      color: var(--ink); background: var(--wash);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    h1, h2, h3, h4 { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; }
+    
+    /* Header Bar */
+    .header-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 12px clamp(20px, 4vw, 60px); background: #ffffff; border-bottom: 1px solid var(--line);
+      color: var(--ink); position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+    }
+    .brand-mark-mini { display: flex; align-items: center; gap: 10px; }
+    .brand-mark { display: flex; align-items: center; }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; background: #ffffff;
+      border: 1px solid var(--line); color: var(--navy-950); font: 700 13px 'Plus Jakarta Sans', sans-serif;
+      border-radius: 8px; cursor: pointer; text-decoration: none; transition: all .15s ease;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+    .back-btn:hover { background: var(--wash); border-color: var(--blue-500); color: var(--blue-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12); }
+
+    /* Main Container */
+    .main-body { padding: 32px clamp(24px, 4vw, 60px) 80px; max-width: 1600px; width: 100%; margin: 0 auto; }
+
+    .content-head { max-width: 800px; margin-bottom: 24px; }
+    .kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--blue-600); font: 700 11.5px/1 'Plus Jakarta Sans', sans-serif; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+    .kicker .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px var(--good-wash); animation: pulse 2s infinite; }
+    .content-head h2 { margin: 0 0 6px; font: 700 clamp(24px,2.8vw,34px)/1.12 'Outfit', sans-serif; letter-spacing: -.6px; color: var(--navy-950); }
+    .content-head p { margin: 0; color: var(--muted); max-width: 620px; font-size: 14.5px; }
+
+    /* Status Bar */
+    .status-bar {
+      margin-bottom: 24px; padding: 14px 22px; background: #fff; border: 1px solid var(--line);
+      border-radius: 10px; font: 600 13.5px 'Plus Jakarta Sans', sans-serif; color: var(--muted); display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.03); transition: all .2s ease;
+    }
+    .status-bar.error { color: #b91c1c; border-color: #fca5a5; background: #fef2f2; }
+    .status-bar.success { color: var(--good); border-color: var(--good-border); background: var(--good-wash); font-weight: 700; }
+
+    .status-action-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 9px 20px; background: var(--good); color: #fff; border-radius: 8px;
+      font: 700 13px 'Plus Jakarta Sans', sans-serif; text-decoration: none; transition: all .15s ease;
+      box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35); white-space: nowrap;
+    }
+    .status-action-btn:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 6px 18px rgba(5, 150, 105, 0.45); }
+
+    /* 3-Column Grid Container for Standalone Agent Terminals */
+    .agents-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 22px;
+      margin-bottom: 28px;
+    }
+
+    .agent-card {
+      background: var(--terminal-bg);
+      border-radius: 12px;
+      border: 1px solid var(--terminal-border);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      height: 380px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .agent-card:hover {
+      border-color: #38bdf8;
+      box-shadow: 0 14px 32px rgba(56, 189, 248, 0.18), 0 0 12px rgba(56, 189, 248, 0.1);
+      transform: translateY(-2px);
+    }
+    .agent-card.active-thinking {
+      border-color: #fbbf24;
+      box-shadow: 0 14px 32px rgba(251, 191, 36, 0.2);
+    }
+    .agent-card.active-completed {
+      border-color: #34d399;
+      box-shadow: 0 10px 28px rgba(52, 211, 153, 0.15);
+    }
+
+    .agent-chrome {
+      background: var(--terminal-chrome);
+      padding: 10px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--terminal-border);
+      flex: none;
+    }
+    .agent-chrome-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .agent-dots { display: flex; gap: 6px; flex-shrink: 0; }
+    .agent-dots span { width: 9px; height: 9px; border-radius: 50%; display: block; }
+    .agent-dots span:nth-child(1) { background: #ff5f56; }
+    .agent-dots span:nth-child(2) { background: #ffbd2e; }
+    .agent-dots span:nth-child(3) { background: #27c93f; }
+
+    .agent-title {
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    .agent-status-pill {
+      display: inline-flex; align-items: center; gap: 5px; padding: 2px 7px;
+      border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0;
+    }
+    .status-standby { background: #1e293b; color: #94a3b8; border: 1px solid #334155; }
+    .status-thinking { background: #78350f; color: #fef08a; border: 1px solid #b45309; }
+    .status-completed { background: #065f46; color: #a7f3d0; border: 1px solid #059669; }
+    .status-failed { background: #831843; color: #fbcfe8; border: 1px solid #be185d; }
+
+    .agent-body {
+      flex: 1;
+      padding: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: #c9d1d9;
+      overflow-y: auto;
+      background: var(--terminal-bg);
+      scrollbar-width: thin;
+      scrollbar-color: #334155 var(--terminal-bg);
+    }
+
+    /* Custom Sleek Dark Scrollbars */
+    .agent-body::-webkit-scrollbar,
+    .activity-log::-webkit-scrollbar { width: 6px; height: 6px; }
+    .agent-body::-webkit-scrollbar-track,
+    .activity-log::-webkit-scrollbar-track { background: var(--terminal-bg); border-radius: 4px; }
+    .agent-body::-webkit-scrollbar-thumb,
+    .activity-log::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; border: 1px solid #111827; }
+    .agent-body::-webkit-scrollbar-thumb:hover,
+    .activity-log::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+    .activity-log { display: flex; flex-direction: column; gap: 8px; }
+    .event-row { display: grid; grid-template-columns: 78px 1fr; gap: 10px; align-items: start; line-height: 1.48; min-width: 0; }
+    .event-badge { display: inline-block; padding: 2px 5px; border-radius: 3px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; text-align: center; }
+    .badge-status, .badge-started, .badge-standby { background: #1e3a8a; color: #93c5fd; }
+    .badge-thinking { background: #78350f; color: #fde68a; }
+    .badge-complete, .badge-done, .badge-success, .badge-completed, .badge-output { background: #065f46; color: #a7f3d0; }
+    .badge-failed, .badge-error { background: #831843; color: #fbcfe8; }
+    .event-msg { color: #e2e8f0; min-width: 0; overflow-wrap: break-word; word-break: break-word; font-size: 11.5px; }
+    .event-msg p { margin: 0 0 4px; }
+    .event-msg p:last-child { margin: 0; }
+    .event-msg code { background: #1e293b; padding: 1px 5px; border-radius: 3px; color: #f472b6; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; }
+    .event-msg pre { background: #111827; border: 1px solid #1f293d; padding: 6px 8px; white-space: pre-wrap; word-break: break-all; border-radius: 4px; max-width: 100%; font-size: 11px; }
+
+    @keyframes pulse { 0% { opacity: 0.4; } 50% { opacity: 1; } 100% { opacity: 0.4; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation Bar -->
+  <header class="header-bar">
+    <div class="brand-mark-mini">
+      <div class="brand-mark">
+        <img src="image.png" alt="Logo" style="height: 48px; width: auto; max-width: 240px; object-fit: contain; display: block;">
+      </div>
+    </div>
+    <div class="nav-actions">
+      <a href="text.html" class="back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Document Upload
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Full-Width Body -->
+  <main class="main-body">
+    <div class="content-head">
+      <div class="kicker"><span class="live-dot"></span>Multi-Agent Execution Engine</div>
+      <h2>Agent Activity &amp; Live Stream</h2>
+      <p>Watch parallel specialized AI agents extract, cross-check, and cite tender document parameters live.</p>
+    </div>
+
+    <!-- Live Status Banner -->
+    <div id="status" class="status-bar">Initialising parallel agent execution terminals...</div>
+
+    <!-- Pre-Loaded 9-Terminal Grid Container -->
+    <div class="agents-grid" id="agents-grid"></div>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.2/marked.min.js"></script>
+  <script>
+    const API_BASE = (window.location.hostname && window.location.port === '8800') ? window.location.origin : 'http://127.0.0.1:8800';
+    const API_URL = `${API_BASE}/extract/stream`;
+    const statusEl = document.querySelector('#status');
+    let extraction = null;
+
+    const PRELOADED_AGENTS = [
+      { name: 'ingest', title: 'ingest', desc: 'Parsing & OCR Text Ingestion' },
+      { name: 'document_metadata', title: 'document metadata', desc: 'Tender Ref, Dates & Client Metadata' },
+      { name: 'project', title: 'project scope', desc: 'Building Area, Dimensions & Spans' },
+      { name: 'building', title: 'structural steel', desc: 'Primary & Secondary Steel Specs' },
+      { name: 'design', title: 'design parameters', desc: 'Codes, Deflections & Coatings' },
+      { name: 'envelope', title: 'building envelope', desc: 'Roofing & Wall Cladding Specs' },
+      { name: 'accessories', title: 'accessories', desc: 'Gutters, Louvers & Levelers' },
+      { name: 'commercial', title: 'commercial terms', desc: 'Payment, Penalties & Guarantees' },
+      { name: 'internal', title: 'quality & safety', desc: 'ISO, EHS & Inspection Points' }
+    ];
+
+    function setStatus(msg, kind='', buttonUrl='', buttonText='') {
+      let html = `<span>${escapeHtml(msg)}</span>`;
+      if (buttonUrl && buttonText) {
+        html += `<a href="${buttonUrl}" class="status-action-btn">${escapeHtml(buttonText)} →</a>`;
+      }
+      statusEl.innerHTML = html;
+      statusEl.className = `status-bar ${kind}`;
+    }
+
+    function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
+
+    function renderMarkdown(text) {
+      const raw = String(text ?? '');
+      if (window.marked) { try { return marked.parse(raw); } catch { /* fall through */ } }
+      return `<p>${escapeHtml(raw)}</p>`;
+    }
+
+    function initPreloadedTerminals() {
+      const grid = document.querySelector('#agents-grid');
+      grid.innerHTML = '';
+      PRELOADED_AGENTS.forEach(ag => {
+        const id = `agent-card-${ag.name.replace(/[^a-z0-9]+/gi, '-')}`;
+        const card = document.createElement('div');
+        card.className = 'agent-card';
+        card.id = id;
+        card.innerHTML = `
+          <div class="agent-chrome">
+            <div class="agent-chrome-left">
+              <div class="agent-dots"><span></span><span></span><span></span></div>
+              <div class="agent-title">${escapeHtml(ag.title)}</div>
+            </div>
+            <span class="agent-status-pill status-standby" id="${id}-pill">STANDBY</span>
+          </div>
+          <div class="agent-body">
+            <div class="activity-log">
+              <div class="event-row">
+                <span class="event-badge badge-standby">STANDBY</span>
+                <div class="event-msg"><p>Agent terminal initialized. ${escapeHtml(ag.desc)}.</p></div>
+              </div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function addEvent(event) {
+      if (!event || !event.agent) return;
+      const id = `agent-card-${event.agent.replace(/[^a-z0-9]+/gi, '-')}`;
+      let card = document.querySelector(`#${id}`);
+      
+      if (!card) {
+        card = document.createElement('div');
+        card.className = 'agent-card';
+        card.id = id;
+        card.innerHTML = `
+          <div class="agent-chrome">
+            <div class="agent-chrome-left">
+              <div class="agent-dots"><span></span><span></span><span></span></div>
+              <div class="agent-title">${escapeHtml(event.agent)}</div>
+            </div>
+            <span class="agent-status-pill status-thinking" id="${id}-pill">RUNNING</span>
+          </div>
+          <div class="agent-body">
+            <div class="activity-log"></div>
+          </div>
+        `;
+        document.querySelector('#agents-grid').appendChild(card);
+      }
+
+      const eventType = (event.event || 'status').toLowerCase();
+      const pill = document.querySelector(`#${id}-pill`);
+      if (pill) {
+        if (eventType === 'thinking' || eventType === 'started') {
+          pill.className = 'agent-status-pill status-thinking';
+          pill.textContent = 'THINKING';
+          card.classList.add('active-thinking');
+        } else if (['complete', 'completed', 'done', 'success', 'output'].includes(eventType)) {
+          pill.className = 'agent-status-pill status-completed';
+          pill.textContent = 'COMPLETE';
+          card.classList.remove('active-thinking');
+          card.classList.add('active-completed');
+        } else if (['failed', 'error'].includes(eventType)) {
+          pill.className = 'agent-status-pill status-failed';
+          pill.textContent = 'FAILED';
+          card.classList.remove('active-thinking');
+        }
+      }
+
+      const stateClass = `badge-${eventType}`;
+      const row = document.createElement('div');
+      row.className = 'event-row';
+      row.innerHTML = `<span class="event-badge ${stateClass}">${escapeHtml(event.event)}</span><div class="event-msg">${renderMarkdown(event.message)}</div>`;
+      
+      const logPane = card.querySelector('.activity-log');
+      logPane.appendChild(row);
+
+      const bodyPane = card.querySelector('.agent-body');
+      bodyPane.scrollTop = bodyPane.scrollHeight;
+    }
+
+    async function readEvents(response) {
+      const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
+      while (true) {
+        const {value, done} = await reader.read(); buffer += decoder.decode(value || new Uint8Array(), {stream: !done});
+        const messages = buffer.split('\n\n'); buffer = messages.pop();
+        for (const message of messages) if (message.startsWith('data: ')) {
+          const event = JSON.parse(message.slice(6)); addEvent(event);
+          if (event.event === 'complete') return event.extraction;
+          if (event.event === 'failed') throw new Error(event.message);
+        }
+        if (done) break;
+      }
+      throw new Error('The live extraction stream ended unexpectedly.');
+    }
+
+    function getStoredFiles() {
+      return new Promise((resolve) => {
+        const DB_NAME = 'TenderFilesDB';
+        const DB_VERSION = 2;
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('files')) {
+            db.createObjectStore('files');
+          }
+        };
+        req.onsuccess = (e) => {
+          const db = e.target.result;
+          try {
+            if (!db.objectStoreNames.contains('files')) {
+              db.close();
+              return resolve([]);
+            }
+            const tx = db.transaction('files', 'readonly');
+            const store = tx.objectStore('files');
+            const getReq = store.get('pending_files');
+            getReq.onsuccess = () => {
+              const res = getReq.result || [];
+              db.close();
+              resolve(res);
+            };
+            getReq.onerror = () => {
+              db.close();
+              resolve([]);
+            };
+          } catch (err) {
+            db.close();
+            resolve([]);
+          }
+        };
+        req.onerror = () => {
+          resolve([]);
+        };
+      });
+    }
+
+    function saveResultsToIndexedDB(data) {
+      return new Promise((resolve) => {
+        const DB_NAME = 'TenderFilesDB';
+        const DB_VERSION = 2;
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onsuccess = (e) => {
+          const db = e.target.result;
+          try {
+            const tx = db.transaction('files', 'readwrite');
+            const store = tx.objectStore('files');
+            const putReq = store.put(data, 'latest_results');
+            putReq.onsuccess = () => { db.close(); resolve(); };
+            putReq.onerror = () => { db.close(); resolve(); };
+          } catch {
+            db.close(); resolve();
+          }
+        };
+        req.onerror = () => resolve();
+      });
+    }
+
+    async function startExtraction() {
+      initPreloadedTerminals();
+      try {
+        const files = await getStoredFiles();
+        if (!files || !files.length) {
+          setStatus('No files found for extraction. Please return to the document upload page.', 'error');
+          return;
+        }
+        setStatus(`Analyzing ${files.length} document(s)... Streaming multi-agent execution live.`);
+        const form = new FormData();
+        files.forEach(file => form.append('files', file));
+
+        const response = await fetch(API_URL, { method: 'POST', body: form });
+        if (!response.ok) {
+          const body = await response.json();
+          throw new Error(body.detail || 'Extraction failed');
+        }
+        const contentType = response.headers.get('content-type') || '';
+        if (contentType.includes('text/event-stream')) {
+          extraction = await readEvents(response);
+        } else {
+          extraction = await response.json();
+        }
+        
+        await saveResultsToIndexedDB(extraction);
+        setStatus('Multi-agent parameter extraction complete!', 'success', 'results.html', 'View Output Matrix');
+      } catch (err) {
+        setStatus(err.message, 'error');
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', startExtraction);
+  </script>
+</body>
+</html>

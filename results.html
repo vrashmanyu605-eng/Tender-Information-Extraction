@@ -1,0 +1,776 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tender Extractor AI — Extracted Parameters Output</title>
+  <link rel="icon" type="image/png" href="image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-950: #070f1e;
+      --navy-900: #0d1b2a;
+      --navy-800: #14273e;
+      --navy-700: #1b3554;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-glow: rgba(59,130,246,.25);
+      
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --line-soft: #f1f5f9;
+      --paper: #ffffff;
+      --wash: #f8fafc;
+      
+      --good: #059669;
+      --good-wash: #ecfdf5;
+      --good-border: #a7f3d0;
+      
+      --warn: #d97706;
+      --warn-wash: #fffbeb;
+      --warn-border: #fde68a;
+
+      --info: #2563eb;
+      --info-wash: #eff6ff;
+      --info-border: #bfdbfe;
+    }
+    
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      color: var(--ink);
+      background: var(--wash);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    
+    h1, h2, h3, h4 { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; }
+
+    /* Header Bar */
+    .header-bar {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 12px clamp(20px, 4vw, 60px); background: #ffffff; border-bottom: 1px solid var(--line);
+      color: var(--ink); position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+    }
+    .brand-mark-mini { display: flex; align-items: center; gap: 10px; }
+    .brand-mark { display: flex; align-items: center; }
+    .nav-actions { display: flex; align-items: center; gap: 12px; }
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px; padding: 9px 18px; background: #ffffff;
+      border: 1px solid var(--line); color: var(--navy-950); font: 700 13px 'Plus Jakarta Sans', sans-serif;
+      border-radius: 8px; cursor: pointer; text-decoration: none; transition: all .15s ease;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+    .back-btn:hover { background: var(--wash); border-color: var(--blue-500); color: var(--blue-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12); }
+
+    /* Main Content Container */
+    .main-body { padding: 32px clamp(24px,4vw,60px) 90px; max-width: 1600px; width: 100%; margin: 0 auto; }
+
+    /* Page Header */
+    .page-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; }
+    .content-head { max-width: 720px; }
+    .kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--good); font: 700 11.5px/1 'Plus Jakarta Sans', sans-serif; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; }
+    .kicker .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px var(--good-wash); }
+    .content-head h2 { margin: 0 0 6px; font: 700 clamp(24px,2.8vw,34px)/1.12 'Outfit', sans-serif; letter-spacing: -.6px; color: var(--navy-950); }
+    .content-head p { margin: 0; color: var(--muted); max-width: 620px; font-size: 14.5px; line-height: 1.5; }
+
+    /* Action Buttons (Copy JSON, Export CSV & PDF) */
+    .output-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .btn-action {
+      display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px;
+      background: #fff; color: var(--navy-900); border: 1px solid var(--line);
+      font: 700 13px 'Plus Jakarta Sans', sans-serif; border-radius: 8px; cursor: pointer; transition: all .15s ease;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    }
+    .btn-action svg { width: 15px; height: 15px; color: var(--navy-800); }
+    .btn-action:hover { border-color: var(--blue-500); color: var(--blue-600); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15); }
+    .btn-action.btn-primary { background: var(--navy-950); color: #fff; border-color: var(--navy-950); }
+    .btn-action.btn-primary svg { color: #93c5fd; }
+    .btn-action.btn-primary:hover { background: var(--navy-900); border-color: var(--navy-900); color: #fff; box-shadow: 0 6px 16px rgba(7, 15, 30, 0.25); }
+
+    /* Summary Metric Cards */
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px; }
+
+    .metric-card {
+      background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 16px 20px;
+      box-shadow: 0 4px 14px rgba(15,23,42,.03); transition: all .15s ease; position: relative; overflow: hidden;
+    }
+    .metric-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(15,23,42,.06); border-color: #cbd5e1; }
+    .metric-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3.5px; }
+    .metric-card.total::before { background: var(--blue-500); }
+    .metric-card.found::before { background: var(--good); }
+    .metric-card.inferred::before { background: var(--info); }
+    .metric-card.missing::before { background: var(--warn); }
+
+    .metric-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .metric-icon { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .metric-card.total .metric-icon { background: #eff6ff; color: var(--blue-600); }
+    .metric-card.found .metric-icon { background: var(--good-wash); color: var(--good); }
+    .metric-card.inferred .metric-icon { background: var(--info-wash); color: var(--info); }
+    .metric-card.missing .metric-icon { background: var(--warn-wash); color: var(--warn); }
+    .metric-icon svg { width: 18px; height: 18px; }
+
+    .metric-card strong { display: block; font: 800 28px/1 'Outfit', sans-serif; color: var(--navy-950); margin-bottom: 2px; letter-spacing: -.5px; }
+    .metric-card span { color: var(--muted); font: 700 11px 'Plus Jakarta Sans', sans-serif; text-transform: uppercase; letter-spacing: .8px; }
+
+    /* Search & Filter Toolbar */
+    .filter-toolbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      margin-bottom: 24px; padding: 14px 18px; background: var(--paper); border: 1px solid var(--line); border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(15,23,42,.02);
+    }
+    .search-box { position: relative; flex: 1; min-width: 260px; max-width: 480px; }
+    .search-box svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--muted); }
+    .search-input {
+      width: 100%; padding: 10px 14px 10px 42px; background: var(--wash); border: 1px solid var(--line);
+      border-radius: 8px; font: 500 13.5px 'Plus Jakarta Sans', sans-serif; color: var(--ink); transition: all .15s ease;
+    }
+    .search-input:focus { outline: 0; border-color: var(--blue-500); background: #fff; box-shadow: 0 0 0 3px var(--blue-glow); }
+
+    .category-pills { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+    .cat-pill {
+      padding: 7px 16px; background: #fff; border: 1px solid var(--line); color: var(--muted);
+      font: 700 12px 'Plus Jakarta Sans', sans-serif; border-radius: 20px; cursor: pointer; transition: all .15s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+    .cat-pill:hover { border-color: #cbd5e1; color: var(--ink); }
+    .cat-pill.active { background: var(--navy-950); border-color: var(--navy-950); color: #fff; box-shadow: 0 2px 8px rgba(7, 15, 30, 0.2); }
+
+    .view-mode-tabs { display: flex; background: var(--wash); border: 1px solid var(--line); border-radius: 8px; padding: 3px; }
+    .view-tab {
+      padding: 6px 14px; border: none; background: transparent; color: var(--muted); font: 700 12px 'Plus Jakarta Sans', sans-serif;
+      border-radius: 6px; cursor: pointer; transition: all .15s ease;
+    }
+    .view-tab.active { background: #fff; color: var(--navy-950); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+    /* Parameter Category Cards */
+    .results-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+
+    .category-card { background: var(--paper); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(15,23,42,.03); transition: border-color .15s, box-shadow .15s; }
+    .category-card:hover { border-color: #cbd5e1; box-shadow: 0 12px 30px rgba(15,23,42,.06); }
+
+    .category-card-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 16px 20px; background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      border-bottom: 1px solid var(--line);
+      cursor: pointer; user-select: none; transition: background .15s ease;
+    }
+    .category-card-head:hover { background: #f1f5f9; }
+    .category-title-group { display: flex; align-items: center; gap: 12px; }
+    .category-icon {
+      width: 32px; height: 32px; border-radius: 8px; background: #f1f5f9; color: var(--navy-900);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .category-icon svg { width: 17px; height: 17px; }
+    .category-card-head h4 { margin: 0; font: 700 16px 'Outfit', sans-serif; color: var(--navy-950); text-transform: capitalize; }
+    .param-count-badge { padding: 4px 11px; background: #e2e8f0; color: var(--navy-800); font: 700 11.5px 'Plus Jakarta Sans', sans-serif; border-radius: 14px; }
+
+    .chevron-icon { width: 18px; height: 18px; color: var(--muted); transition: transform 0.25s ease; flex-shrink: 0; }
+    .category-card.collapsed .chevron-icon { transform: rotate(-90deg); }
+    .category-card.collapsed .table-wrapper { display: none; }
+    .category-card.collapsed .category-card-head { border-bottom: none; }
+
+    /* Parameters Table */
+    .table-wrapper {
+      width: 100%; max-height: 480px; overflow-y: auto; overflow-x: auto;
+      scrollbar-width: thin; scrollbar-color: #cbd5e1 #f8fafc;
+    }
+    .table-wrapper::-webkit-scrollbar { width: 6px; height: 6px; }
+    .table-wrapper::-webkit-scrollbar-track { background: #f8fafc; border-radius: 4px; }
+    .table-wrapper::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+    table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+    th, td { text-align: left; vertical-align: top; padding: 12px 16px; border-bottom: 1px solid var(--line-soft); }
+    th {
+      position: sticky; top: 0; z-index: 10;
+      color: var(--muted); font: 700 11px 'Plus Jakarta Sans', sans-serif; letter-spacing: 1px;
+      text-transform: uppercase; background: #f1f5f9; box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    tr:last-child td { border-bottom: 0; }
+    tr:hover td { background: #f8fafc; }
+
+    td.param-name { width: 28%; font-weight: 700; color: var(--navy-950); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.3px; }
+    td.param-value { width: 32%; color: var(--ink); font-weight: 500; word-break: break-word; font-size: 13.5px; }
+    td.param-status { width: 15%; }
+    td.param-evidence { width: 25%; color: var(--muted); }
+
+    /* Value Chips */
+    .value-chip { display: inline-block; padding: 3px 8px; background: #f1f5f9; border: 1px solid var(--line); border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11.5px; color: #334155; margin: 2px 2px 2px 0; }
+    .val-missing { color: #94a3b8; font-style: italic; font-size: 12.5px; }
+
+    /* Status Pill Badges */
+    .pill { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; font: 700 11px 'Plus Jakarta Sans', sans-serif; letter-spacing: .4px; border-radius: 20px; text-transform: uppercase; }
+    .pill.explicit, .pill.found { background: var(--good-wash); color: var(--good); border: 1px solid var(--good-border); }
+    .pill.inferred { background: var(--info-wash); color: var(--info); border: 1px solid var(--info-border); }
+    .pill.missing, .pill.not_found { background: #f3f4f6; color: #6b7280; border: 1px solid #e5e7eb; }
+    .pill.conflict { background: var(--warn-wash); color: var(--warn); border: 1px solid var(--warn-border); }
+
+    /* Evidence citation box */
+    .citation-box {
+      background: #f8fafc; border: 1px solid #e2e8f0; border-left: 3px solid var(--blue-500);
+      padding: 8px 12px; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      color: #334155; line-height: 1.45; word-break: break-word; cursor: pointer; transition: all .15s ease;
+    }
+    .citation-box:hover { background: #f1f5f9; border-color: var(--blue-600); transform: translateX(2px); }
+    .citation-box:empty { display: none; }
+
+    /* Evidence Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(7, 15, 30, 0.65); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
+      opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    }
+    .modal-backdrop.active { opacity: 1; pointer-events: auto; }
+    .modal-card {
+      background: #fff; border-radius: 14px; width: 100%; max-width: 620px; padding: 28px;
+      box-shadow: 0 20px 48px rgba(7, 15, 30, 0.3); position: relative; border: 1px solid var(--line);
+    }
+    .modal-close { position: absolute; top: 18px; right: 18px; border: 0; background: #f1f5f9; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-weight: 700; color: var(--muted); transition: background .15s; }
+    .modal-close:hover { background: #e2e8f0; color: var(--ink); }
+
+    /* Toast Notification */
+    .toast-msg {
+      position: fixed; bottom: 24px; right: 24px; z-index: 2000;
+      padding: 14px 22px; background: var(--navy-950); color: #fff;
+      font: 700 13px 'Plus Jakarta Sans', sans-serif; border-radius: 10px;
+      box-shadow: 0 10px 28px rgba(7, 15, 30, 0.35); border: 1px solid var(--navy-800);
+      display: flex; align-items: center; gap: 10px; animation: fadeIn .25s ease;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation Bar -->
+  <header class="header-bar">
+    <div class="brand-mark-mini">
+      <div class="brand-mark">
+        <img src="image.png" alt="Logo" style="height: 48px; width: auto; max-width: 240px; object-fit: contain; display: block;">
+      </div>
+    </div>
+    <div class="nav-actions">
+      <a href="extractor.html" class="back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Live Stream
+      </a>
+      <a href="text.html" class="back-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Upload
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Body -->
+  <main class="main-body">
+
+    <!-- Page Header & Export Actions -->
+    <div class="page-head">
+      <div class="content-head">
+        <div class="kicker"><span class="live-dot"></span>Extracted Parameter Matrix</div>
+        <h2>Tender Parameter Results</h2>
+        <p>Review the complete set of parameters extracted from your tender documents along with confidence statuses and source evidence citations.</p>
+      </div>
+      <div class="output-actions">
+        <button class="btn-action" id="btn-toggle-all-accordion">Expand All</button>
+        <button class="btn-action" id="csv">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download CSV
+        </button>
+        <button class="btn-action btn-primary" id="pdf">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Download PDF Report
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Metrics Grid -->
+    <div class="summary-grid">
+      <div class="metric-card total">
+        <div class="metric-top">
+          <span>Total Parameters</span>
+          <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        </div>
+        <strong id="metric-total">0</strong>
+      </div>
+      <div class="metric-card found">
+        <div class="metric-top">
+          <span>Explicitly Found</span>
+          <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        </div>
+        <strong id="metric-found">0</strong>
+      </div>
+      <div class="metric-card inferred">
+        <div class="metric-top">
+          <span>Inferred Fields</span>
+          <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
+        </div>
+        <strong id="metric-inferred">0</strong>
+      </div>
+      <div class="metric-card missing">
+        <div class="metric-top">
+          <span>Missing / N/A</span>
+          <div class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg></div>
+        </div>
+        <strong id="metric-missing">0</strong>
+      </div>
+    </div>
+
+    <!-- Search & Category Filter Toolbar -->
+    <div class="filter-toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="search-input" placeholder="Filter parameters, values, or evidence citation keywords...">
+      </div>
+      <div class="view-mode-tabs">
+        <button class="view-tab active" data-view="grid">Accordion View</button>
+        <button class="view-tab" data-view="table">Unified Matrix</button>
+      </div>
+    </div>
+
+    <!-- Category Pills List -->
+    <div class="category-pills" id="category-pills"></div>
+
+    <!-- Output Display Area -->
+    <div id="output-area"></div>
+
+  </main>
+
+  <!-- Evidence Modal -->
+  <div class="modal-backdrop" id="evidence-modal">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close-btn">&times;</button>
+      <h3 style="font: 700 18px 'Outfit', sans-serif; color: var(--navy-950); margin-bottom: 14px;" id="modal-title">Evidence Detail</h3>
+      <div style="font-size: 13.5px; display: flex; flex-direction: column; gap: 14px;">
+        <div>
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px;">Extracted Parameter Value</span>
+          <div id="modal-val" style="margin-top: 5px; font-family: 'JetBrains Mono', monospace; color: var(--navy-950); font-weight: 600;"></div>
+        </div>
+        <div>
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px;">Source Citation Snippet</span>
+          <div id="modal-cite" style="margin-top: 5px; padding: 12px; background: #f8fafc; border: 1px solid var(--line); border-left: 3px solid var(--blue-500); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #334155; border-radius: 6px;"></div>
+        </div>
+        <div>
+          <span style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px;">Document Reference</span>
+          <div id="modal-ref" style="margin-top: 5px; color: var(--blue-600); font-weight: 600; font-size: 13px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const DEMO_DATA = {
+      extraction_summary: { fields_found: 42, fields_not_found: 2, fields_inferred: 4, total_fields: 48 },
+      document_metadata: {
+        tender_name: { value: "PEB Structural Logistics Hub - Package 04", extraction_status: "EXPLICIT", source_reference: "Cover Page - Para 1", reference_text: "Tender for Design, Supply, and Erection of Pre-Engineered Building (PEB) Logistics Hub - Package 04", confidence: 0.99 },
+        client_name: { value: "Engineered Building Systems Ltd", extraction_status: "EXPLICIT", source_reference: "Page 2, Section 1.1", reference_text: "Client/Employer: Engineered Building Systems Ltd, Hyderabad Facility", confidence: 0.98 },
+        submission_deadline: { value: "2026-09-15", extraction_status: "EXPLICIT", source_reference: "Page 4, Notice Inviting Tender", reference_text: "Last date of submission: 15th September 2026 before 15:00 hrs IST", confidence: 0.96 },
+        project_location: { value: "Zaheerabad Industrial Zone, Telangana", extraction_status: "EXPLICIT", source_reference: "Page 6, Section 2.1", reference_text: "Site Location: NIMZ Zaheerabad Industrial Park, Telangana, India", confidence: 0.97 },
+        tender_ref_number: { value: "PEBS/NIMZ/2026/T-8092", extraction_status: "EXPLICIT", source_reference: "Header Page 1-128", reference_text: "Tender Ref: PEBS/NIMZ/2026/T-8092", confidence: 1.0 },
+        currency: { value: "INR (Indian Rupee)", extraction_status: "EXPLICIT", source_reference: "Page 12, Commercial Clause", reference_text: "All quotes and payments shall be in Indian Rupees (INR)", confidence: 0.99 }
+      },
+      project: {
+        building_usage: { value: "High-Bay Logistics Distribution Center", extraction_status: "EXPLICIT", source_reference: "Page 8, Scope of Work", reference_text: "Intended occupancy: Heavy Duty Automated Warehousing and High-Bay Logistics", confidence: 0.95 },
+        total_covered_area: { value: "45,000 sqm", extraction_status: "EXPLICIT", source_reference: "Page 9, Section 3.2", reference_text: "Total Plinth Covered Area: 45,000 SQM across Main Bay and Annexes", confidence: 0.98 },
+        building_length: { value: "300 meters", extraction_status: "EXPLICIT", source_reference: "Page 14, Structural Layout", reference_text: "Out-to-out building length along grid line A-Z: 300.0m", confidence: 0.96 },
+        building_width: { value: "150 meters", extraction_status: "EXPLICIT", source_reference: "Page 14, Structural Layout", reference_text: "Total width: 150m consisting of 5 multi-spans of 30m each", confidence: 0.96 },
+        clear_height: { value: "12.5 meters", extraction_status: "EXPLICIT", source_reference: "Page 15, Section 4.1", reference_text: "Clear height at Eave Line: 12.5m above finished floor level (FFL)", confidence: 0.97 },
+        roof_slope: { value: "1:10 (10%)", extraction_status: "EXPLICIT", source_reference: "Page 16, Section 4.3", reference_text: "Standard Gable Roof slope shall be maintained at 1 in 10 slope", confidence: 0.94 },
+        bay_spacing: { value: "7.5 meters typical, 9.0m at ends", extraction_status: "EXPLICIT", source_reference: "Page 18, Framing Plan", reference_text: "Interior bay spacing: 7.5m; End bay spacing: 9.0m for wind brace optimization", confidence: 0.93 },
+        number_of_spans: { value: 5, unit: "spans", extraction_status: "INFERRED", source_reference: "Page 14 & 18", reference_text: "5 continuous spans of 30 meters each creating 150m width", confidence: 0.91 }
+      },
+      building: {
+        primary_structural_steel: { value: "ASTM A572 Grade 50 / IS 2062 E350", extraction_status: "EXPLICIT", source_reference: "Page 22, Material Specs", reference_text: "All built-up primary rigid frame members shall be fabricated from ASTM A572 Grade 50 steel plate", confidence: 0.98 },
+        secondary_cold_formed_steel: { value: "Galvanized High Yield Steel (345 MPa, 275 gsm)", extraction_status: "EXPLICIT", source_reference: "Page 24, Section 5.4", reference_text: "Purlins and girts shall be Z/C cold-formed profiles from hot-dip galvanized steel 275 gsm coating", confidence: 0.96 },
+        design_codes: { value: ["MBMA 2010", "IS 800:2007", "AISI 2016", "IS 875 Part 3"], extraction_status: "EXPLICIT", source_reference: "Page 20, Design Criteria", reference_text: "Structural design shall conform strictly to MBMA 2010 edition, IS 800:2007 for steel design", confidence: 0.99 },
+        wind_speed_design: { value: "44 m/s (Basic Wind Speed)", extraction_status: "EXPLICIT", source_reference: "Page 21, Section 4.8", reference_text: "Basic wind speed Vb = 44 m/s as per IS 875 Part 3 (2015) for Zaheerabad region", confidence: 0.95 },
+        seismic_zone: { value: "Zone II (Z = 0.10)", extraction_status: "EXPLICIT", source_reference: "Page 21, Section 4.9", reference_text: "Seismic Design Category: Zone II in accordance with IS 1893:2016", confidence: 0.97 },
+        crane_capacity: { value: "2x 10 MT EOT Cranes", extraction_status: "EXPLICIT", source_reference: "Page 32, Crane Provisions", reference_text: "Primary frames designed for two 10 Tonne Electric Overhead Traveling Cranes", confidence: 0.94 },
+        mezzanine_floor_load: { value: "5.0 kN/sqm Live Load", extraction_status: "EXPLICIT", source_reference: "Page 35, Mezzanine Specs", reference_text: "Office Mezzanine floor deck slab designed for 5.0 kN/m2 uniform live load", confidence: 0.92 }
+      },
+      design: {
+        deflection_limit_main_frame: { value: "H / 180", extraction_status: "EXPLICIT", source_reference: "Page 26, Deflection Limits", reference_text: "Maximum allowable lateral sway deflection at eave: H/180 under service load", confidence: 0.94 },
+        deflection_limit_purlin: { value: "L / 180", extraction_status: "EXPLICIT", source_reference: "Page 26, Table 6.1", reference_text: "Roof purlin vertical deflection limit: L/180 under total gravity load", confidence: 0.96 },
+        anchor_bolt_grade: { value: "IS 5624 Grade 8.8 High Strength", extraction_status: "EXPLICIT", source_reference: "Page 28, Anchor Bolt Detailing", reference_text: "Anchor bolts shall be IS 5624 Grade 8.8 heavy hex structural bolts with double nuts", confidence: 0.97 },
+        surface_preparation: { value: "SA 2.5 Near White Blast Cleaning", extraction_status: "EXPLICIT", source_reference: "Page 38, Painting Specs", reference_text: "All primary structural members shall undergo shot blasting to SA 2.5 standard prior to priming", confidence: 0.98 },
+        paint_system: { value: "Epoxy Zinc Phosphate Primer (80 microns) + PU Finish (60 microns)", extraction_status: "EXPLICIT", source_reference: "Page 39, Protective Coating", reference_text: "Two-coat high performance system: 80um epoxy zinc phosphate primer plus 60um polyurethane topcoat", confidence: 0.96 },
+        fire_rating_requirement: { value: "2 Hours Structural Fire Resistance", extraction_status: "INFERRED", source_reference: "Page 42, Fire Safety Appendix", reference_text: "Intumescent coating required on exposed columns to achieve 120 minutes fire integrity", confidence: 0.89 }
+      },
+      envelope: {
+        roof_sheeting_material: { value: "Bare Galvalume (AZ150) 0.50mm TCT", extraction_status: "EXPLICIT", source_reference: "Page 45, Roof Cladding", reference_text: "Roofing sheet: 0.50mm TCT high tensile Bare Galvalume steel sheet with AZ150 zinc-aluminum coating", confidence: 0.98 },
+        roof_profile: { value: "Standing Seam 360-Degree Mechanical Seam", extraction_status: "EXPLICIT", source_reference: "Page 46, Section 7.2", reference_text: "Concealed fastener standing seam profile with 360 degree double lock mechanical seam", confidence: 0.97 },
+        wall_cladding_material: { value: "Color Coated Galvalume (AZ150) 0.50mm TCT", extraction_status: "EXPLICIT", source_reference: "Page 48, Wall Cladding", reference_text: "Pre-painted Galvalume color coated sheet 0.50mm TCT with SMP coating (Off-White color)", confidence: 0.95 },
+        wall_masonry_height: { value: "3.0 meters Brickwork / AAC Block", extraction_status: "EXPLICIT", source_reference: "Page 50, Architectural Details", reference_text: "Dado wall height: 3.0m AAC block masonry with plaster and paint", confidence: 0.96 },
+        insulation_type: { value: "Rockwool Glasswool Insulation with FSK Facing", extraction_status: "EXPLICIT", source_reference: "Page 52, Thermal Insulation", reference_text: "50mm thick Fiber Glass wool insulation with high density Foil-Scrim-Kraft (FSK) vapor barrier", confidence: 0.94 },
+        skylight_coverage: { value: "5% of Total Roof Area (Polycarbonate)", extraction_status: "EXPLICIT", source_reference: "Page 54, Natural Lighting", reference_text: "Translucent Polycarbonate embossed sheets installed over 5% of total roof area", confidence: 0.96 }
+      },
+      accessories: {
+        ridge_ventilator: { value: "Continuous Monitor Type Ridge Vent (600mm throat)", extraction_status: "EXPLICIT", source_reference: "Page 58, Ventilation Plan", reference_text: "Natural continuous ridge ventilators with 600mm throat opening", confidence: 0.93 },
+        louvers: { value: "Stormproof Fixed Aluminum Louvers (1200x2400mm)", extraction_status: "EXPLICIT", source_reference: "Page 60, Wall Openings", reference_text: "Extruded aluminum stormproof louvers fitted with bird screen mesh", confidence: 0.92 },
+        gutters_and_downspouts: { value: "1.0mm Thick Galvalume Eave Gutters + 160mm UPVC Downspouts", extraction_status: "EXPLICIT", source_reference: "Page 62, Rainwater Drainage", reference_text: "External eave gutters fabricated from 1.0mm Galvalume; downspouts 160mm PVC heavy duty pipes", confidence: 0.95 },
+        canopy_projection: { value: "4.5 meter Cantilever Canopy along loading docks", extraction_status: "EXPLICIT", source_reference: "Page 65, Loading Dock Details", reference_text: "4.5m continuous cantilevered canopy over 12 dock leveler bays", confidence: 0.91 },
+        dock_levelers_count: { value: "12 Motorized Hydraulic Dock Levelers", extraction_status: "EXPLICIT", source_reference: "Page 68, Logistics Equipment", reference_text: "Supply and integration of 12 numbers 6 Tonne hydraulic dock levelers", confidence: 0.94 }
+      },
+      commercial: {
+        payment_terms: { value: "10% Advance, 70% Supply Delivery, 20% Erection Completion", extraction_status: "EXPLICIT", source_reference: "Page 74, Commercial Conditions", reference_text: "10% advance against Bank Guarantee; 70% on pro-rata delivery; 20% on final erection", confidence: 0.97 },
+        delivery_schedule: { value: "16 Weeks from Drawing Approval", extraction_status: "EXPLICIT", source_reference: "Page 76, Section 9.1", reference_text: "Complete design, fabrication, supply, and erection within 16 calendar weeks", confidence: 0.96 },
+        liquidated_damages: { value: "0.5% per week up to maximum 10%", extraction_status: "EXPLICIT", source_reference: "Page 78, Penalty Clause", reference_text: "LD for delay: 0.5% of contract value per week subject to 10% cap", confidence: 0.98 },
+        warranty_period: { value: "10 Years Structural Warranty, 20 Years Galvalume Sheeting", extraction_status: "EXPLICIT", source_reference: "Page 82, Guarantee & Warranty", reference_text: "10 years for PEB structural framing integrity and 20 years perforation warranty for Galvalume sheets", confidence: 0.99 },
+        performance_bank_guarantee: { value: "5% of Contract Value", extraction_status: "EXPLICIT", source_reference: "Page 85, Securities", reference_text: "PBG equal to 5% of order value valid through warranty period", confidence: 0.97 },
+        price_escalation_clause: { value: "Firm & Fixed Price (No Escalation)", extraction_status: "EXPLICIT", source_reference: "Page 88, Price Variation", reference_text: "Contract price shall remain firm and fixed without any steel price escalation", confidence: 0.98 }
+      },
+      internal: {
+        safety_compliance: { value: "ISO 45001 & EHS Safety Standards", extraction_status: "EXPLICIT", source_reference: "Page 94, Safety Annexure", reference_text: "100% adherence to EHS site safety protocol, safety nets, life lines", confidence: 0.95 },
+        quality_inspection_hold_points: { value: "Raw Material Mill Test Certificates + NDT Testing (100% UT on Welds)", extraction_status: "EXPLICIT", source_reference: "Page 98, QAP Matrix", reference_text: "Third-party inspection hold points: MTC verification, MPI and 100% Ultrasonic Testing", confidence: 0.96 },
+        environmental_rating: { value: "IGBC Green Building Platinum Rating Target", extraction_status: "INFERRED", source_reference: "Page 104, Sustainability", reference_text: "High SRI roof sheeting (SRI >= 78) targeted to achieve IGBC Platinum", confidence: 0.88 },
+        erection_methodology: { value: "Mobile Crane Erection with Life-Line Safety Mesh", extraction_status: "EXPLICIT", source_reference: "Page 110, Site Execution Plan", reference_text: "Rigid frame erection using 50T telescopic mobile cranes with wire rope safety grid", confidence: 0.94 }
+      }
+    };
+
+    let extractionData = DEMO_DATA;
+    let activeCat = 'all';
+    let searchQuery = '';
+    let viewMode = 'grid';
+
+    function escapeHtml(val) { return String(val ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+    function formatVal(field) {
+      if (!field || field.value === null || field.value === undefined || field.value === '') return '<span class="val-missing">Not specified</span>';
+      if (Array.isArray(field.value)) return field.value.map(v => `<span class="value-chip">${escapeHtml(typeof v === 'object' ? (v.value || JSON.stringify(v)) : v)}</span>`).join(' ');
+      if (typeof field.value === 'object') return `<span class="value-chip">${escapeHtml(JSON.stringify(field.value))}</span>`;
+      return escapeHtml(field.value);
+    }
+
+    function showToast(msg) {
+      const toast = document.createElement('div');
+      toast.className = 'toast-msg';
+      toast.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> ${escapeHtml(msg)}`;
+      document.body.appendChild(toast);
+      setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .3s ease'; setTimeout(() => toast.remove(), 300); }, 2500);
+    }
+
+    function openEvidenceModal(name, field) {
+      document.getElementById('modal-title').textContent = name.replaceAll('_', ' ').toUpperCase();
+      document.getElementById('modal-val').innerHTML = formatVal(field);
+      document.getElementById('modal-cite').textContent = field.reference_text || field.notes || 'No quote snippet available.';
+      document.getElementById('modal-ref').textContent = field.source_reference || 'Reference N/A';
+      document.getElementById('evidence-modal').classList.add('active');
+    }
+
+    function renderMetrics(data) {
+      if (!document.getElementById('metric-total')) return;
+      const groups = ['document_metadata','project','building','design','envelope','accessories','commercial','internal'];
+      let tot = 0, fnd = 0, inf = 0, mis = 0;
+      for (const g of groups) {
+        for (const [_, f] of Object.entries(data[g] || {})) {
+          tot++;
+          const st = (f.extraction_status || 'NOT_FOUND').toUpperCase();
+          if (st === 'EXPLICIT' || st === 'FOUND') fnd++;
+          else if (st === 'INFERRED') inf++;
+          else mis++;
+        }
+      }
+      document.getElementById('metric-total').textContent = tot;
+      document.getElementById('metric-found').textContent = fnd;
+      document.getElementById('metric-inferred').textContent = inf;
+      document.getElementById('metric-missing').textContent = mis;
+    }
+
+    function renderCategoryPills(data) {
+      const el = document.getElementById('category-pills');
+      if (!el) return;
+      const groups = ['document_metadata','project','building','design','envelope','accessories','commercial','internal'];
+      let tot = 0;
+      groups.forEach(g => tot += Object.keys(data[g] || {}).length);
+      
+      let html = `<button class="cat-pill ${activeCat === 'all' ? 'active':''}" data-cat="all">All (${tot})</button>`;
+      groups.forEach(g => {
+        const count = Object.keys(data[g] || {}).length;
+        if (count > 0) {
+          html += `<button class="cat-pill ${activeCat === g ? 'active':''}" data-cat="${g}">${escapeHtml(g.replaceAll('_',' ').toUpperCase())} (${count})</button>`;
+        }
+      });
+      el.innerHTML = html;
+
+      el.querySelectorAll('.cat-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          activeCat = btn.dataset.cat;
+          renderCategoryPills(extractionData);
+          render(extractionData);
+        });
+      });
+    }
+
+    function render(data) {
+      if (!data) return;
+      renderMetrics(data);
+      const groups = ['document_metadata','project','building','design','envelope','accessories','commercial','internal'];
+      const output = document.getElementById('output-area');
+
+      if (viewMode === 'table') {
+        let rows = '';
+        let matchCount = 0;
+        for (const g of groups) {
+          if (activeCat !== 'all' && activeCat !== g) continue;
+          for (const [name, f] of Object.entries(data[g] || {})) {
+            const q = searchQuery.toLowerCase();
+            const param = name.replaceAll('_',' ');
+            if (q && !param.toLowerCase().includes(q) && !String(f.value??'').toLowerCase().includes(q)) continue;
+            
+            matchCount++;
+            rows += `
+              <tr>
+                <td class="param-name" style="width: 40%;">
+                  <span style="font-size:10.5px; color:var(--blue-600); display:block; font-weight:700;">${escapeHtml(g.replaceAll('_',' '))}</span>
+                  ${escapeHtml(param.toUpperCase())}
+                </td>
+                <td class="param-value" style="width: 60%;">${formatVal(f)}</td>
+              </tr>
+            `;
+          }
+        }
+        output.innerHTML = `
+          <div class="category-card">
+            <div class="category-card-head">
+              <div class="category-title-group">
+                <div class="category-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div>
+                <h4>Unified Parameter Matrix</h4>
+              </div>
+              <span class="param-count-badge">${matchCount} Items</span>
+            </div>
+            <div class="table-wrapper" style="max-height: 650px;">
+              <table>
+                <thead>
+                  <tr><th>Category &amp; Parameter</th><th>Extracted Value</th></tr>
+                </thead>
+                <tbody>${rows || '<tr><td colspan="2" style="text-align:center; padding:30px; color:var(--muted);">No matching parameters found.</td></tr>'}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      let gridHtml = '<div class="results-grid">';
+      let cardCount = 0;
+
+      for (const g of groups) {
+        if (activeCat !== 'all' && activeCat !== g) continue;
+        const entries = Object.entries(data[g] || {}).filter(([name, f]) => {
+          if (!searchQuery) return true;
+          const q = searchQuery.toLowerCase();
+          return name.replaceAll('_',' ').toLowerCase().includes(q) || String(f.value??'').toLowerCase().includes(q);
+        });
+
+        if (searchQuery && entries.length === 0) continue;
+        cardCount++;
+
+        const isCollapsed = !searchQuery && cardCount > 1;
+
+        gridHtml += `
+          <div class="category-card ${isCollapsed ? 'collapsed' : ''}">
+            <div class="category-card-head" title="Click to expand / collapse">
+              <div class="category-title-group">
+                <div class="category-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                </div>
+                <h4>${escapeHtml(g.replaceAll('_', ' '))}</h4>
+              </div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="param-count-badge">${entries.length} items</span>
+                <svg class="chevron-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 9l6 6 6-6"/></svg>
+              </div>
+            </div>
+            <div class="table-wrapper">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Parameter Name</th>
+                    <th>Extracted Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+        `;
+
+        for (const [name, f] of entries) {
+          gridHtml += `
+            <tr>
+              <td class="param-name" style="width: 40%;">${escapeHtml(name.replaceAll('_',' ').toUpperCase())}</td>
+              <td class="param-value" style="width: 60%;">${formatVal(f)}</td>
+            </tr>
+          `;
+        }
+
+        gridHtml += `
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }
+      gridHtml += '</div>';
+
+      if (cardCount === 0) {
+        gridHtml = `<div class="category-card" style="padding: 40px; text-align: center; color: var(--muted);">No matching parameters found.</div>`;
+      }
+
+      output.innerHTML = gridHtml;
+
+      output.querySelectorAll('.category-card-head').forEach(head => {
+        head.addEventListener('click', () => {
+          const card = head.closest('.category-card');
+          card.classList.toggle('collapsed');
+        });
+      });
+    }
+
+    const API_BASE = (window.location.hostname && window.location.port === '8800') ? window.location.origin : 'http://127.0.0.1:8800';
+
+    async function exportCsvBackend(data) {
+      try {
+        showToast('Generating CSV via Python Backend...');
+        const res = await fetch(`${API_BASE}/download/csv`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data || {})
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Server returned status ${res.status}: ${errText}`);
+        }
+        const blob = await res.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Tender_Extraction_Report.csv';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+        showToast('CSV Downloaded!');
+      } catch (err) {
+        console.error('CSV Export Error:', err);
+        alert('CSV Export Error: ' + err.message);
+        showToast('CSV generation failed');
+      }
+    }
+
+    async function downloadPdfBackend(data) {
+      try {
+        showToast('Generating PDF Report via Python Backend...');
+        const res = await fetch(`${API_BASE}/download/pdf`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data || {})
+        });
+        if (!res.ok) {
+          const errText = await res.text();
+          throw new Error(`Server returned status ${res.status}: ${errText}`);
+        }
+        const blob = await res.blob();
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Tender_Extraction_Report.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(link.href);
+        showToast('PDF Downloaded!');
+      } catch (err) {
+        console.error('PDF Export Error:', err);
+        alert('PDF Export Error: ' + err.message);
+        showToast('PDF generation failed');
+      }
+    }
+
+    function getStoredResults() {
+      return new Promise((resolve) => {
+        const DB_NAME = 'TenderFilesDB';
+        const DB_VERSION = 2;
+        const req = indexedDB.open(DB_NAME, DB_VERSION);
+        req.onsuccess = (e) => {
+          const db = e.target.result;
+          try {
+            if (!db.objectStoreNames.contains('files')) { db.close(); return resolve(null); }
+            const tx = db.transaction('files', 'readonly');
+            const store = tx.objectStore('files');
+            const getReq = store.get('latest_results');
+            getReq.onsuccess = () => { const res = getReq.result || null; db.close(); resolve(res); };
+            getReq.onerror = () => { db.close(); resolve(null); };
+          } catch { db.close(); resolve(null); }
+        };
+        req.onerror = () => resolve(null);
+      });
+    }
+
+    async function init() {
+      const dbData = await getStoredResults();
+      if (dbData && dbData.extraction_summary) {
+        extractionData = dbData;
+      }
+
+      renderCategoryPills(extractionData);
+      render(extractionData);
+
+      const searchInput = document.getElementById('search-input');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          searchQuery = e.target.value;
+          render(extractionData);
+        });
+      }
+
+      document.querySelectorAll('.view-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.view-tab').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          viewMode = btn.dataset.view;
+          render(extractionData);
+        });
+      });
+
+      const csvBtn = document.getElementById('csv');
+      if (csvBtn) {
+        csvBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          exportCsvBackend(extractionData);
+        });
+      }
+
+      const pdfBtn = document.getElementById('pdf');
+      if (pdfBtn) {
+        pdfBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          downloadPdfBackend(extractionData);
+        });
+      }
+
+      let isAllExpanded = false;
+      const toggleAccordionBtn = document.getElementById('btn-toggle-all-accordion');
+      if (toggleAccordionBtn) {
+        toggleAccordionBtn.addEventListener('click', () => {
+          isAllExpanded = !isAllExpanded;
+          const cards = document.querySelectorAll('.category-card');
+          cards.forEach(card => {
+            if (isAllExpanded) card.classList.remove('collapsed');
+            else card.classList.add('collapsed');
+          });
+          toggleAccordionBtn.textContent = isAllExpanded ? 'Collapse All' : 'Expand All';
+        });
+      }
+
+      document.getElementById('modal-close-btn').addEventListener('click', () => document.getElementById('evidence-modal').classList.remove('active'));
+      document.getElementById('evidence-modal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('evidence-modal')) document.getElementById('evidence-modal').classList.remove('active');
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
