@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tender Extractor AI — Upload Documents</title>
+  <link rel="icon" type="image/png" href="image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-950: #070f1e;
+      --navy-900: #0d1b2a;
+      --navy-800: #14273e;
+      --navy-700: #1b3554;
+      --blue-500: #3b82f6;
+      --blue-600: #2563eb;
+      --blue-glow: rgba(59, 130, 246, 0.35);
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --line-soft: #f1f5f9;
+      --paper: #ffffff;
+      --wash: #f8fafc;
+      --good: #059669;
+      --good-wash: #ecfdf5;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      color: var(--ink); background: var(--wash);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    h1, h2, h3, h4 { font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif; }
+    .app { display: flex; align-items: stretch; min-height: 100vh; }
+
+    /* ---------- Left brand panel ---------- */
+    .brand-panel {
+      flex: 0 0 40%; width: 40%; position: sticky; top: 0; align-self: flex-start; height: 100vh;
+      overflow-y: auto;
+      background: radial-gradient(1100px 750px at -10% -10%, #1d4ed8 0%, #0a1b42 45%, #040c24 100%);
+      color: #e9eef5;
+      padding: 40px clamp(28px, 4vw, 52px);
+      display: flex; flex-direction: column; justify-content: center; gap: 24px;
+      box-shadow: 6px 0 24px rgba(0,0,0,0.15);
+    }
+    .brand-mark-box {
+      background: #ffffff; padding: 8px 18px; border-radius: 10px;
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.22); margin-bottom: 18px; width: fit-content;
+    }
+    .brand-mark-box img { height: 48px; width: auto; max-width: 220px; object-fit: contain; display: block; }
+
+    .brand-panel h1 { margin: 0 0 10px; font: 700 32px/1.12 'Outfit', sans-serif; letter-spacing: -.5px; color: #ffffff; }
+    .brand-panel h1 em { font-style: normal; color: #93c5fd; }
+    .brand-lede { margin: 0 0 4px; color: #94a3b8; font-size: 14px; line-height: 1.55; }
+
+    .feature-list { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+    .feature {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 18px;
+      border-radius: 12px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+    }
+    .feature::before {
+      content: ''; position: absolute; inset: 0; border-radius: 12px; padding: 1.5px;
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.8), rgba(59, 130, 246, 0.2), rgba(147, 197, 253, 0.6));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+    }
+    .feature:hover {
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.4) 0%, rgba(15, 23, 42, 0.6) 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(29, 78, 216, 0.3), 0 0 16px rgba(59, 130, 246, 0.2);
+    }
+    .feature:hover::before { opacity: 1; }
+    .feature .f-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .feature .f-icon { width: 20px; height: 20px; flex: none; color: #60a5fa; transition: transform 0.25s ease; }
+    .feature:hover .f-icon { color: #93c5fd; transform: scale(1.1); }
+    .feature .f-title { font: 700 14px 'Plus Jakarta Sans', sans-serif; color: #f8fafc; }
+    .feature .f-desc { font-size: 12.5px; line-height: 1.5; color: #94a3b8; }
+
+    .brand-footer { margin-top: 8px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.12); }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .badge { display: inline-flex; align-items: center; gap: 7px; padding: 7px 13px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); border-radius: 8px; font: 700 11.5px/1 'Plus Jakarta Sans', sans-serif; color: #cbd5e1; transition: all .2s ease; }
+    .badge:hover { background: rgba(255,255,255,.14); border-color: rgba(96,165,250,.4); color: #ffffff; }
+    .badge svg { width: 13px; height: 13px; color: #60a5fa; }
+
+    /* ---------- Right content panel ---------- */
+    .content-panel {
+      flex: 0 0 60%; width: 60%; min-width: 0;
+      padding: 40px clamp(24px, 4.5vw, 64px);
+      display: flex; flex-direction: column; justify-content: center; min-height: 100vh;
+    }
+
+    .content-head { max-width: 720px; margin-bottom: 28px; }
+    .kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--blue-600); font: 700 11.5px/1 'Plus Jakarta Sans', sans-serif; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+    .kicker .live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px var(--good-wash); }
+    .content-head h2 { margin: 0 0 8px; font: 700 clamp(24px,2.8vw,34px)/1.12 'Outfit', sans-serif; letter-spacing: -.6px; color: var(--navy-950); }
+    .content-head p { margin: 0; color: var(--muted); max-width: 560px; font-size: 15px; line-height: 1.55; }
+
+    .panel { background: var(--paper); border: 1px solid var(--line); box-shadow: 0 12px 32px rgba(15,23,42,.04); border-radius: 14px; }
+
+    /* Upload card */
+    .upload-card { padding: 28px 30px; }
+    .upload-card .card-label { font: 700 11.5px 'Plus Jakarta Sans', sans-serif; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    .drop {
+      position: relative; border: 2px dashed #cbd5e1; background: var(--wash);
+      padding: 32px 24px; text-align: center; border-radius: 12px; transition: all .2s ease;
+      cursor: pointer;
+    }
+    .drop:hover, .drop.drag { border-color: var(--blue-500); background: #eff6ff; }
+    .drop svg.up-icon { width: 32px; height: 32px; color: var(--blue-500); margin-bottom: 10px; transition: transform .2s; }
+    .drop:hover svg.up-icon { transform: translateY(-2px); }
+    .drop .drop-title { font: 700 15px 'Plus Jakarta Sans', sans-serif; color: var(--navy-950); margin-bottom: 4px; }
+    .drop .drop-sub { font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+    .drop input[type=file] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+    .drop .browse-btn { display: inline-block; padding: 8px 18px; background: #ffffff; border: 1px solid var(--line); font: 700 12.5px 'Plus Jakarta Sans', sans-serif; color: var(--navy-900); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.04); pointer-events: none; }
+
+    .file-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .file-chips:empty { display: none; }
+    .file-chip { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; background: var(--navy-900); color: #f1f5f9; font: 600 12px 'Plus Jakarta Sans', sans-serif; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .file-chip svg { width: 13px; height: 13px; color: #93c5fd; }
+    .no-files { font: 500 13px 'Plus Jakarta Sans', sans-serif; color: var(--muted); margin-top: 12px; }
+
+    .upload-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 22px; }
+    button { border: 0; cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; }
+    #extract {
+      position: relative;
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--navy-950) 0%, var(--navy-900) 100%);
+      color: #ffffff;
+      font: 700 14px 'Plus Jakarta Sans', sans-serif;
+      letter-spacing: 0.3px;
+      border-radius: 10px;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      box-shadow: 0 8px 22px rgba(14, 28, 51, 0.25);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow: hidden;
+    }
+    #extract::before {
+      content: ''; position: absolute; inset: 0; border-radius: 10px; padding: 1.5px;
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      background-size: 200% 200%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      opacity: 0; transition: opacity 0.3s ease, background-position 0.4s ease; pointer-events: none;
+    }
+    #extract:hover:not(:disabled) {
+      background: linear-gradient(135deg, #132440 0%, #0d1a30 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(14, 28, 51, 0.4), 0 0 16px rgba(56, 189, 248, 0.25);
+      border-color: transparent;
+    }
+    #extract:hover:not(:disabled)::before { opacity: 1; background-position: 100% 100%; }
+    #extract:active:not(:disabled) { transform: translateY(0); box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); }
+    #extract:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+
+    .status { font: 600 13.5px 'Plus Jakarta Sans', sans-serif; color: var(--muted); width: 100%; margin-top: 6px; }
+    .status.error { color: #b91c1c; } .status.success { color: var(--good); font-weight: 700; }
+
+    @media (max-width: 960px) {
+      .app { flex-direction: column; }
+      .brand-panel { position: relative; width: 100%; flex: none; height: auto; padding: 36px 24px; justify-content: flex-start; }
+      .content-panel { width: 100%; flex: none; padding: 36px 20px 70px; min-height: auto; justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ================= LEFT: BRAND PANEL (INDUSTRIES) ================= -->
+    <aside class="brand-panel">
+      <div>
+        <div class="brand-mark-box">
+          <img src="image.png" alt="Logo">
+        </div>
+        <h1>ABC <em>Industries</em></h1>
+        <p class="brand-lede">Leading Precision Engineering, Pre-Engineered Steel Buildings & AI Document Intelligence.</p>
+      </div>
+
+      <div class="feature-list">
+        <div class="feature">
+          <div class="f-head">
+            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span class="f-title">Mission & Vision</span>
+          </div>
+          <div class="f-desc">Providing innovative, cost-effective technical products & solutions with total quality management.</div>
+        </div>
+
+        <!-- <div class="feature">
+          <div class="f-head">
+            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            <span class="f-title">Global Subsidiaries</span>
+          </div>
+          <div class="f-desc">
+            • <strong>ABC Global Inc. (USA)</strong> — Houston & Tennessee PEB Plant<br>
+            • <strong>ABC GmbH (Germany)</strong> — Aerospace & Energy<br>
+            • <strong>ABC Cadnum (France)</strong> — Precision Machining
+          </div>
+        </div> -->
+
+        <div class="feature">
+          <div class="f-head">
+            <svg class="f-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15l-2 5l9-9l-4 0l2-5l-9 9l4 0z"/></svg>
+            <span class="f-title">Quality & Accreditations</span>
+          </div>
+          <div class="f-desc">ISO 9001:2015, ISO 14001, ISO 45001, AS 9100, IRIS ISO 22163 & EN 15085 Certified.</div>
+        </div>
+      </div>
+
+      <!-- <div class="brand-footer">
+        <div class="badge-row">
+          <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>Est. 1988 Hyderabad</span>
+          <span class="badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M9 4v16"/></svg>abcindia.com</span>
+        </div>
+      </div> -->
+    </aside>
+
+    <!-- ================= RIGHT: CONTENT PANEL (UPLOAD) ================= -->
+    <main class="content-panel">
+
+      <div class="content-head">
+        <div class="kicker"><span class="live-dot"></span>Upload &amp; Extract</div>
+        <h2>Extract Tender Parameters</h2>
+        <p>Drop in one or more tender documents. Parallel specialized AI agents will extract, cross-check and cite every parameter.</p>
+      </div>
+
+      <!-- Upload card -->
+      <section class="panel upload-card">
+        <div class="card-label">Source documents</div>
+        <div class="drop" id="drop">
+          <svg class="up-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 15V3m0 0 4 4m-4-4L8 7"/><path d="M20 15v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-4"/></svg>
+          <div class="drop-title">Drag files here, or click to browse</div>
+          <div class="drop-sub">PDF, Word, Excel, CSV or scanned images</div>
+          <span class="browse-btn">Choose files</span>
+          <input id="files" type="file" multiple accept=".pdf,.xls,.xlsx,.xlsm,.csv,.doc,.docx,.png,.jpg,.jpeg,.tif,.tiff,.bmp,.webp">
+        </div>
+        <div id="selected" class="no-files">No files selected</div>
+
+        <div class="upload-actions">
+          <button id="extract">Extract parameters</button>
+          <span class="status" id="status" aria-live="polite"></span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const fileInput = document.querySelector('#files');
+    const drop = document.querySelector('#drop');
+    const selected = document.querySelector('#selected');
+    const extractButton = document.querySelector('#extract');
+    const status = document.querySelector('#status');
+
+    function setStatus(message, kind='') { status.textContent = message; status.className = `status ${kind}`; }
+    function escapeHtml(value) { return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char])); }
+    function fileIconSvg() { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>'; }
+
+    fileInput.addEventListener('change', () => {
+      if (!fileInput.files.length) { selected.className = 'no-files'; selected.textContent = 'No files selected'; return; }
+      selected.className = 'file-chips';
+      selected.innerHTML = [...fileInput.files].map(file => `<span class="file-chip">${fileIconSvg()}${escapeHtml(file.name)}</span>`).join('');
+    });
+    ['dragenter','dragover'].forEach(event => drop.addEventListener(event, e => { e.preventDefault(); drop.classList.add('drag'); }));
+    ['dragleave','drop'].forEach(event => drop.addEventListener(event, e => { e.preventDefault(); drop.classList.remove('drag'); }));
+    drop.addEventListener('drop', e => { fileInput.files = e.dataTransfer.files; fileInput.dispatchEvent(new Event('change')); });
+
+    function saveFilesToIndexedDB(fileList) {
+      return new Promise((resolve, reject) => {
+        const DB_NAME = 'TenderFilesDB';
+        const req = indexedDB.open(DB_NAME);
+        req.onupgradeneeded = (e) => {
+          const db = e.target.result;
+          if (!db.objectStoreNames.contains('files')) {
+            db.createObjectStore('files');
+          }
+        };
+        req.onsuccess = (e) => {
+          const db = e.target.result;
+          try {
+            if (!db.objectStoreNames.contains('files')) {
+              db.close();
+              // Re-open with incremented version to trigger objectStore creation if missing
+              const version = db.version + 1;
+              const req2 = indexedDB.open(DB_NAME, version);
+              req2.onupgradeneeded = (ev) => {
+                ev.target.result.createObjectStore('files');
+              };
+              req2.onsuccess = (ev) => {
+                const db2 = ev.target.result;
+                const tx = db2.transaction('files', 'readwrite');
+                tx.objectStore('files').put([...fileList], 'pending_files');
+                tx.oncomplete = () => { db2.close(); resolve(); };
+                tx.onerror = (err) => { db2.close(); reject(err.target ? err.target.error : err); };
+              };
+              req2.onerror = (err) => reject(err.target ? err.target.error : err);
+              return;
+            }
+            const tx = db.transaction('files', 'readwrite');
+            const store = tx.objectStore('files');
+            store.put([...fileList], 'pending_files');
+            tx.oncomplete = () => { db.close(); resolve(); };
+            tx.onerror = (err) => { db.close(); reject(err.target ? err.target.error : err); };
+          } catch (err) { db.close(); reject(err); }
+        };
+        req.onerror = (e) => reject(e.target ? e.target.error : e);
+      });
+    }
+
+    extractButton.addEventListener('click', async () => {
+      if (!fileInput.files || !fileInput.files.length) {
+        return setStatus('Upload at least one file.', 'error');
+      }
+      extractButton.disabled = true;
+      setStatus('Preparing files and initializing agent stream...');
+      try {
+        await saveFilesToIndexedDB(fileInput.files);
+        window.location.href = 'extractor.html';
+      } catch (err) {
+        console.error('File save error:', err);
+        const errMsg = (err && err.message) ? err.message : String(err);
+        setStatus(`Failed to prepare files for extraction: ${errMsg}`, 'error');
+        extractButton.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
